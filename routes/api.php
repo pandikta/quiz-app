@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\UserController;
+use App\Http\Controllers\QuestionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -26,6 +27,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     // Only admin
     Route::group(['middleware' => ['isAdmin']], function () {
         Route::get('/users', [UserController::class, 'getAllUser']);
+        Route::resource('/questions', QuestionController::class)->except('create', 'edit');
     });
 
     Route::get('/profile', function (Request $request) {

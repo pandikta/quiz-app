@@ -116,6 +116,7 @@
 
                     <div class="form px-4 pt-5">
                         <form action="">
+                            @csrf
                             <input type="text" name="email" id="email" required class="form-control" placeholder="Email or Phone">
                             <input type="password" name="password" id="password" required class="form-control" placeholder="Password">
                             <button type="button" onclick="login_()" class="btn btn-dark btn-block">Login</button>
@@ -152,6 +153,9 @@
 </body>
 <script>
     function login_() {
+        // var token = $("meta[name='csrf-token']").attr("content");
+
+        // console.log(token);
         if ($("#email").val() == '') {
             Swal.fire({
                 type: 'warning',
@@ -170,6 +174,51 @@
                 text: msg
             });
             return false
+        } else {
+            $.ajax({
+                url: "http://127.0.0.1:8000/api/login",
+                type: "POST",
+                dataType: "JSON",
+                cache: false,
+                data: {
+                    "email": $("#email").val(),
+                    "password": $("#password").val(),
+                },
+                success: function(data) {
+
+                    Swal.fire({
+                        type: 'success',
+                        title: 'Login berhasil',
+                        text: data.responeText
+                    }).then(() => {
+                        window.location.href = "{{ route('question') }}";
+
+                    })
+                    localStorage.setItem('token', data.access_token);
+
+                },
+                statusCode: {
+                    422: function(data) {
+                        Swal.fire({
+                            type: 'warning',
+                            title: 'Login gagal',
+                            text: data.responseText
+                        });
+                    },
+                    500: function(data) {
+                        Swal.fire({
+                            type: 'error',
+                            title: 'Server Eror',
+                        });
+                    }
+                },
+                error: function(data) {
+                    Swal.fire({
+                        type: 'error',
+                        title: 'Server Eror',
+                    });
+                }
+            })
         }
 
     }

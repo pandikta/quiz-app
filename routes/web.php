@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\QuestionController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -15,4 +16,13 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('login');
+});
+
+Route::get('/dashboard', function () {
+    return view('dashboard.index');
+})->name('dashboard');
+
+Route::get('/exam', [QuestionController::class, 'quiz'])->name('question');
+Route::resource('/question', QuestionController::class);
+Route::group(['middleware' => ['auth:sanctum']], function () {
 });

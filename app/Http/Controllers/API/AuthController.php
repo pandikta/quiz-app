@@ -51,8 +51,6 @@ class AuthController extends Controller
             return response()->json(['error' => $validator->errors()], 422);
         }
 
-
-
         $userData = User::where('email', $request->email)->first();
 
         if (!$userData) {
@@ -66,8 +64,7 @@ class AuthController extends Controller
         }
 
         if (!Auth::attempt($credentials)) {
-            return response()
-                ->json(['message' => 'Unauthorized'], 401);
+            return response()->json(['message' => 'Unauthorized'], 401);
         }
         $token = $userData->createToken('auth_token')->plainTextToken;
 
@@ -79,7 +76,6 @@ class AuthController extends Controller
             ]);
     }
 
-    // method for user logout and delete token
     public function logout()
     {
         auth()->user()->tokens()->delete();

@@ -122,24 +122,16 @@
                             <button type="button" onclick="login_()" class="btn btn-dark btn-block">Login</button>
                         </form>
                     </div>
-
-
-
                 </div>
-                <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
-
-
+                <div class="tab-pane fade show active d-none" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
                     <div class="form px-4">
-
-                        <input type="text" name="" class="form-control" placeholder="Name">
-
-                        <input type="text" name="" class="form-control" placeholder="Email">
-
-                        <input type="text" name="" class="form-control" placeholder="Phone">
-
-                        <input type="text" name="" class="form-control" placeholder="Password">
-
-                        <button class="btn btn-dark btn-block">Signup</button>
+                        <form action="" id="form-regis">
+                            @csrf
+                            <input type="text" name="name" id="name" class="form-control" placeholder="Name">
+                            <input type="text" name="email" id="email2" class="form-control" placeholder="Email">
+                            <input type="password" name="password" id="password2" class="form-control" placeholder="Password">
+                            <button class="btn btn-dark btn-block" type="button" onclick="register_()">Signup</button>
+                        </form>
                     </div>
                 </div>
 
@@ -152,6 +144,27 @@
     <script src="{{ url('assets/js/scripts.js') }}"></script>
 </body>
 <script>
+    $(document).ready(function() {
+        $('#pills-profile-tab').on('click', function() {
+            $('a[data-toggle="pill"]').removeClass('active');
+            $('a[data-toggle="pill"]').removeClass('show');
+            $(this).addClass('show');
+            $(this).addClass('active');
+            $('#pills-profile').removeClass('d-none');
+            $('#pills-home').addClass('d-none');
+
+        });
+
+        $('#pills-home-tab').on('click', function() {
+            $('a[data-toggle="pill"]').removeClass('active');
+            $('a[data-toggle="pill"]').removeClass('show');
+            $(this).addClass('show');
+            $(this).addClass('active');
+            $('#pills-profile').addClass('d-none');
+            $('#pills-home').removeClass('d-none');
+        });
+    });
+
     function login_() {
         // var token = $("meta[name='csrf-token']").attr("content");
 
@@ -191,7 +204,7 @@
                         title: 'Login berhasil',
                         text: data.responeText
                     }).then(() => {
-                        window.location.href = "{{ route('question') }}";
+                        window.location.href = "{{ route('exam') }}";
 
                     })
                     localStorage.setItem('token', data.access_token);
@@ -202,6 +215,81 @@
                         Swal.fire({
                             type: 'warning',
                             title: 'Login gagal',
+                            text: data.responseText
+                        });
+                    },
+                    500: function(data) {
+                        Swal.fire({
+                            type: 'error',
+                            title: 'Server Eror',
+                        });
+                    }
+                },
+                error: function(data) {
+                    Swal.fire({
+                        type: 'error',
+                        title: 'Server Eror',
+                    });
+                }
+            })
+        }
+
+    }
+
+    function register_() {
+        console.log('a');
+        if ($("#name").val() == '') {
+            Swal.fire({
+                type: 'warning',
+                title: 'Oops...',
+                text: 'Nama Wajib Diisi !'
+            });
+            return false
+        } else if ($("#email2").val() == '') {
+            Swal.fire({
+                type: 'warning',
+                title: 'Oops...',
+                text: 'Alamat Email Wajib Diisi !'
+            });
+            return false
+        } else if ($("#password2").val() == '' || $("#password2").val().length < 6) {
+            var msg = 'Password wajib diisi!'
+            if ($("#password2").val().length < 6) {
+                var msg = 'Password minimal 6 karakter'
+            }
+            Swal.fire({
+                type: 'warning',
+                title: 'Oops...',
+                text: msg
+            });
+            return false
+        } else {
+            let data = $("#form-regis").serialize();
+
+            $.ajax({
+                url: "http://127.0.0.1:8000/api/register",
+                type: "POST",
+                dataType: "JSON",
+                cache: false,
+                data: data,
+                success: function(data) {
+
+                    Swal.fire({
+                        type: 'success',
+                        title: 'Register berhasil',
+                        text: data.responeText
+                    }).then(() => {
+                        window.location.href = "{{ route('login') }}";
+
+                    })
+                    localStorage.setItem('token', data.access_token);
+
+                },
+                statusCode: {
+                    422: function(data) {
+                        Swal.fire({
+                            type: 'warning',
+                            title: 'Register gagal',
                             text: data.responseText
                         });
                     },
